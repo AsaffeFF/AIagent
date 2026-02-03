@@ -1,5 +1,6 @@
 import os
-from config import MAX_CHARS
+from google.genai import types
+
 
 def get_file_content(working_directory, file_path):
     try:
@@ -13,10 +14,10 @@ def get_file_content(working_directory, file_path):
             return f'Error: File not found or is not a regular file: "{file_path}"'
 
         with open(abs_file_path, "r") as f:
-            content = f.read(MAX_CHARS)
+            content = f.read(10000)
             if f.read(1):
                 content += (
-                    f'[...File "{file_path}" truncated at {MAX_CHARS} characters]'
+                    f'[...File "{file_path}" truncated at {10000} characters]'
                 )
         
         return content
@@ -24,6 +25,20 @@ def get_file_content(working_directory, file_path):
     except Exception as e:
         return f"Error: {e}"
     
+
+schema_get_files_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Read file content, max 10000 characters.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+    ),
+)
 
 
 
